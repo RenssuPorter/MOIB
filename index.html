@@ -161,6 +161,7 @@
     /* ── PHOTOS ── */
     #photos {
       border-bottom: 1px solid var(--grey);
+      position: relative;
     }
 
 
@@ -416,49 +417,94 @@
     }
 
 
-    /* ── SCROLL TRACK ── */
-    .scroll-track {
-      padding: 16px 40px;
+
+    /* ── SCROLLER NAV ── */
+    .scroller-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 16px;
-      border-top: 1px solid var(--grey);
+      padding: 13px 40px;
+      border-bottom: 1px solid var(--grey);
     }
 
-    .scroll-track-label {
+    .scroller-header-label {
       font-size: 9px;
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--white);
-      white-space: nowrap;
+      opacity: 0.4;
     }
 
-    .scroll-track-bar {
-      flex: 1;
-      height: 1px;
-      background: var(--grey);
-      position: relative;
-    }
-
-    .scroll-track-thumb {
-      position: absolute;
-      top: -2px;
-      height: 5px;
-      background: var(--white);
-      border-radius: 2px;
-      transition: left 0.1s, width 0.1s;
-    }
-
-    .scroll-arrows {
-      font-size: 13px;
-      color: var(--white);
+    .scroller-counter {
+      font-size: 9px;
       letter-spacing: 0.2em;
-      animation: nudge 2s ease-in-out infinite;
+      color: var(--white);
+      opacity: 0.3;
     }
 
-    @keyframes nudge {
-      0%, 100% { transform: translateX(0); }
-      50%       { transform: translateX(5px); }
+    .click-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 10%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: crosshair;
+      transition: opacity 0.3s;
+    }
+
+    .click-zone.left  { left: 0;  background: linear-gradient(to right, rgba(8,8,8,0.6), transparent); }
+    .click-zone.right { right: 0; background: linear-gradient(to left,  rgba(8,8,8,0.6), transparent); }
+    .click-zone.hidden { opacity: 0; pointer-events: none; }
+
+    .click-zone .arrow {
+      font-size: 18px;
+      color: var(--white);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    #photos:hover .click-zone:not(.hidden) .arrow { opacity: 0.6; }
+    .click-zone.left:hover  .arrow { opacity: 1 !important; transform: translateX(-3px); }
+    .click-zone.right:hover .arrow { opacity: 1 !important; transform: translateX(3px); }
+
+    .scroller-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 40px;
+      border-top: 1px solid var(--grey);
+      border-bottom: 1px solid var(--grey);
+    }
+
+    .hint {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: 0.25;
+    }
+
+    .dot-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      background: var(--grey);
+      border-radius: 50%;
+      cursor: crosshair;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .dot.active {
+      background: var(--white);
+      transform: scale(1.5);
     }
 
     /* ── MOBILE ── */
@@ -494,7 +540,13 @@
   </section>
 
   <!-- PHOTOS -->
+  <div class="scroller-header">
+    <span class="scroller-header-label">Click or scroll to explore</span>
+    <span class="scroller-counter" id="scrollCounter">1 / 6</span>
+  </div>
   <div id="photos">
+    <div class="click-zone left hidden" id="zoneLeft" onclick="nudgeScroll(-1)"><span class="arrow">←</span></div>
+    <div class="click-zone right" id="zoneRight" onclick="nudgeScroll(1)"><span class="arrow">→</span></div>
     <div class="photo-scroll" id="photoScroll">
       <div class="video-item" onclick="playVideo(this)">
         <video src="rabid_dogs.mp4" preload="metadata" playsinline></video>
@@ -542,9 +594,18 @@
       </div>
     </div>
   </div>
-  <div class="scroll-track">
-    <span class="scroll-track-label">← drag →</span>
-    <div class="scroll-track-bar"><div class="scroll-track-thumb" id="scrollThumb"></div></div>
+  <div class="scroller-footer">
+    <span class="hint">← →</span>
+    <div class="dot-nav" id="dots">
+      <div class="dot active" onclick="goToSlide(0)"></div>
+      <div class="dot" onclick="goToSlide(1)"></div>
+      <div class="dot" onclick="goToSlide(2)"></div>
+      <div class="dot" onclick="goToSlide(3)"></div>
+      <div class="dot" onclick="goToSlide(4)"></div>
+      <div class="dot" onclick="goToSlide(5)"></div>
+    </div>
+    <span class="hint">drag</span>
+  </div>
     <span class="scroll-arrows">→</span>
   </div>
 
@@ -577,8 +638,43 @@
   </footer>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>  <script>
+    const track   = document.getElementById('photoScroll');
+    const dots    = document.querySelectorAll('#dots .dot');
+    const zLeft   = document.getElementById('zoneLeft');
+    const zRight  = document.getElementById('zoneRight');
+    const counter = document.getElementById('scrollCounter');
+    const total   = dots.length;
+
+    function slideWidth() {
+      return track.querySelector('.photo-item, .video-item').offsetWidth;
+    }
+
+    function nudgeScroll(dir) {
+      if (window._wasDragging) return;
+      track.scrollBy({ left: dir * slideWidth(), behavior: 'smooth' });
+    }
+
+    function goToSlide(idx) {
+      track.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' });
+    }
+
+    function updateUI() {
+      const idx = Math.round(track.scrollLeft / slideWidth());
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      counter.textContent = (idx + 1) + ' / ' + total;
+      zLeft.classList.toggle('hidden', idx === 0);
+      zRight.classList.toggle('hidden', idx === total - 1);
+    }
+
+    track.addEventListener('scroll', updateUI);
+    window.addEventListener('resize', updateUI);
+
+    track.addEventListener('wheel', e => {
+      e.preventDefault();
+      track.scrollBy({ left: e.deltaY * 2, behavior: 'smooth' });
+    }, { passive: false });
+
     function playVideo(item) {
-      // Don't fire if user was dragging
       if (window._wasDragging) return;
       const vid = item.querySelector('video');
       if (vid.paused) {
@@ -594,50 +690,23 @@
     }
 
     // Drag to scroll
-    const scroll = document.getElementById('photoScroll');
-    const thumb  = document.getElementById('scrollThumb');
     let isDown = false, startX, left, dragDist = 0;
-
-    function updateThumb() {
-      const ratio = scroll.scrollLeft / (scroll.scrollWidth - scroll.clientWidth);
-      const trackW = thumb.parentElement.clientWidth;
-      const thumbW = Math.max(40, (scroll.clientWidth / scroll.scrollWidth) * trackW);
-      thumb.style.width = thumbW + 'px';
-      thumb.style.left  = (ratio * (trackW - thumbW)) + 'px';
-    }
-
-    scroll.addEventListener('scroll', updateThumb);
-    window.addEventListener('load', updateThumb);
-    window.addEventListener('resize', updateThumb);
-
-    scroll.addEventListener('mousedown', e => {
-      isDown = true; dragDist = 0;
-      startX = e.pageX - scroll.offsetLeft;
-      left   = scroll.scrollLeft;
-      window._wasDragging = false;
-    });
-    scroll.addEventListener('mouseleave', () => { isDown = false; });
-    scroll.addEventListener('mouseup', () => { isDown = false; });
-    scroll.addEventListener('mousemove', e => {
+    track.addEventListener('mousedown', e => { isDown = true; dragDist = 0; startX = e.pageX - track.offsetLeft; left = track.scrollLeft; window._wasDragging = false; });
+    track.addEventListener('mouseleave', () => { isDown = false; });
+    track.addEventListener('mouseup', () => { isDown = false; });
+    track.addEventListener('mousemove', e => {
       if (!isDown) return;
       e.preventDefault();
-      const x = e.pageX - scroll.offsetLeft;
+      const x = e.pageX - track.offsetLeft;
       const walk = x - startX;
       dragDist += Math.abs(walk);
       if (dragDist > 5) window._wasDragging = true;
-      scroll.scrollLeft = left - walk * 1.4;
+      track.scrollLeft = left - walk * 1.4;
     });
 
-    // Touch support
     let touchStartX = 0, touchLeft = 0;
-    scroll.addEventListener('touchstart', e => {
-      touchStartX = e.touches[0].pageX;
-      touchLeft = scroll.scrollLeft;
-    }, { passive: true });
-    scroll.addEventListener('touchmove', e => {
-      const dx = touchStartX - e.touches[0].pageX;
-      scroll.scrollLeft = touchLeft + dx;
-    }, { passive: true });
+    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].pageX; touchLeft = track.scrollLeft; }, { passive: true });
+    track.addEventListener('touchmove', e => { track.scrollLeft = touchLeft + (touchStartX - e.touches[0].pageX); }, { passive: true });
   </script>
 </body>
 </html>
