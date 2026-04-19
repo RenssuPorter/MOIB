@@ -460,7 +460,7 @@
     }
 
     .carousel-slide {
-      flex: 0 0 100%;
+      flex: 0 0 78%;
       height: 100%;
       position: relative;
     }
@@ -485,7 +485,7 @@
 
     .carousel-btn {
       pointer-events: all;
-      width: 15%;
+      width: 10%;
       height: 100%;
       background: transparent;
       border: none;
@@ -706,6 +706,20 @@
     const btnNext = document.getElementById('btnNext');
     const counter = document.getElementById('scrollCounter');
     const total   = 6;
+    // Recalculate how many positions are actually reachable
+    function reachableCount() {
+      const vw = document.getElementById('carouselViewport').offsetWidth;
+      const sw = slideW();
+      return Math.min(total, Math.ceil((sw * total - vw) / sw) + 1);
+    }
+    function updateDotVisibility() {
+      const reach = reachableCount();
+      document.querySelectorAll('#dots .dot').forEach((d, i) => {
+        d.style.display = i < reach ? '' : 'none';
+      });
+    }
+    window.addEventListener('resize', updateDotVisibility);
+    window.addEventListener('load', updateDotVisibility);
     let current   = 0;
     let transitioning = false;
 
