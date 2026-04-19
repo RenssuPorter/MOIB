@@ -498,28 +498,32 @@
 
     .carousel-btn {
       pointer-events: all;
-      background: rgba(8,8,8,0.75);
-      border: 1px solid var(--grey);
+      background: rgba(8,8,8,0.85);
+      border: 1px solid rgba(255,255,255,0.15);
       color: var(--white);
-      font-size: 18px;
-      width: 44px;
-      height: 44px;
+      font-size: 22px;
+      width: 64px;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: crosshair;
       transition: background 0.15s, border-color 0.15s, opacity 0.3s;
-      opacity: 0;
+      opacity: 0.35;
     }
 
     #photos:hover .carousel-btn { opacity: 1; }
     .carousel-btn:hover { background: var(--grey); border-color: var(--white); }
     .carousel-btn.hidden { opacity: 0 !important; pointer-events: none; }
 
+    @media (max-width: 640px) {
+      .carousel-btn { display: none; }
+    }
+
     .scroller-footer {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       padding: 13px 40px;
       border-top: 1px solid var(--grey);
       border-bottom: 1px solid var(--grey);
@@ -659,7 +663,6 @@
   </div>
 
   <div class="scroller-footer">
-    <span class="hint">← →</span>
     <div class="dot-nav" id="dots">
       <div class="dot active" onclick="carouselGo(0)"></div>
       <div class="dot" onclick="carouselGo(1)"></div>
@@ -668,7 +671,6 @@
       <div class="dot" onclick="carouselGo(4)"></div>
       <div class="dot" onclick="carouselGo(5)"></div>
     </div>
-    <span class="hint">swipe</span>
   </div>
       <div class="dot" onclick="goToSlide(1)"></div>
       <div class="dot" onclick="goToSlide(2)"></div>
@@ -676,9 +678,7 @@
       <div class="dot" onclick="goToSlide(4)"></div>
       <div class="dot" onclick="goToSlide(5)"></div>
     </div>
-    <span class="hint">drag</span>
   </div>
-    <span class="scroll-arrows">→</span>
   </div>
 
 
@@ -699,7 +699,7 @@
   <!-- BOOKING -->
   <a id="booking" href="mailto:moonibrahimofficial@gmail.com">
     <span class="booking-label">Get in touch</span>
-    <span class="booking-email">moonibrahimofficial@gmail.com ↗</span>
+    <span class="booking-email">moonibrahimofficial@gmail.com</span>
   </a>
 
 
