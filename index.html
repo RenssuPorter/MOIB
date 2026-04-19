@@ -669,10 +669,8 @@
     track.addEventListener('scroll', updateUI);
     window.addEventListener('resize', updateUI);
 
-    track.addEventListener('wheel', e => {
-      e.preventDefault();
-      track.scrollBy({ left: e.deltaY * 2, behavior: 'smooth' });
-    }, { passive: false });
+    // Vertical scroll is NOT hijacked — page scrolls normally
+    // Horizontal swipe works natively on touch devices
 
     function playVideo(item) {
       if (window._wasDragging) return;
@@ -689,24 +687,20 @@
       }
     }
 
-    // Drag to scroll
+    // Mouse drag horizontal scroll (desktop only)
     let isDown = false, startX, left, dragDist = 0;
-    track.addEventListener('mousedown', e => { isDown = true; dragDist = 0; startX = e.pageX - track.offsetLeft; left = track.scrollLeft; window._wasDragging = false; });
-    track.addEventListener('mouseleave', () => { isDown = false; });
-    track.addEventListener('mouseup', () => { isDown = false; });
+    track.addEventListener('mousedown', e => {
+      isDown = true; dragDist = 0;
+      startX = e.pageX; left = track.scrollLeft;
+      window._wasDragging = false;
+    });
+    window.addEventListener('mouseup', () => { isDown = false; });
     track.addEventListener('mousemove', e => {
       if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - track.offsetLeft;
-      const walk = x - startX;
-      dragDist += Math.abs(walk);
+      dragDist += Math.abs(e.movementX);
       if (dragDist > 5) window._wasDragging = true;
-      track.scrollLeft = left - walk * 1.4;
+      track.scrollLeft = left - (e.pageX - startX);
     });
-
-    let touchStartX = 0, touchLeft = 0;
-    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].pageX; touchLeft = track.scrollLeft; }, { passive: true });
-    track.addEventListener('touchmove', e => { track.scrollLeft = touchLeft + (touchStartX - e.touches[0].pageX); }, { passive: true });
   </script>
 </body>
 </html>
