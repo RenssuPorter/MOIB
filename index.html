@@ -557,6 +557,32 @@
       transform: scale(1.5);
     }
 
+
+    /* ── FULLSCREEN BTN ── */
+    .fullscreen-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 20;
+      background: rgba(8,8,8,0.7);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      width: 36px;
+      height: 36px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s;
+    }
+
+    .fullscreen-btn:hover { background: rgba(8,8,8,0.95); }
+
+    @media (max-width: 768px) {
+      .fullscreen-btn { display: flex; }
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 640px) {
       #hero { padding: 0 24px 40px; }
@@ -606,6 +632,7 @@
           <span class="video-title">Rabid Dogs</span>
           <span class="video-sub">Live from the Slaughterhouse</span>
         </div>
+        <button class="fullscreen-btn" onclick="goFullscreen(this)" title="Fullscreen">⛶</button>
       </div>
       </div>
       <div class="carousel-slide">
@@ -625,6 +652,7 @@
           <span class="video-title">Short Trip</span>
           <span class="video-sub">Live from the Slaughterhouse</span>
         </div>
+        <button class="fullscreen-btn" onclick="goFullscreen(this)" title="Fullscreen">⛶</button>
       </div>
       </div>
       <div class="carousel-slide">
@@ -800,6 +828,15 @@
       track.style.transition = 'none';
       track.style.transform = `translateX(${-current * slideW() + mDragX}px)`;
     });
+
+    function goFullscreen(btn) {
+      const vid = btn.closest('.video-item').querySelector('video');
+      if (vid.requestFullscreen) vid.requestFullscreen();
+      else if (vid.webkitRequestFullscreen) vid.webkitRequestFullscreen();
+      else if (vid.webkitEnterFullscreen) vid.webkitEnterFullscreen();
+      vid.play();
+      btn.closest('.video-item').classList.add('playing');
+    }
 
     // Video play
     function playVideo(item) {
