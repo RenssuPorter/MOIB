@@ -411,6 +411,23 @@
     }
     .photos-lightbox-close:hover { opacity: 1; }
 
+    /* Progress bar */
+    .photos-progress {
+      height: 1px;
+      background: var(--grey);
+      margin: 16px 60px 0;
+      position: relative;
+    }
+    .photos-progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: #fff;
+      transition: width 0.1s ease;
+    }
+
     /* ── BOOKING ── */
     #booking {
       border-top: 1px solid var(--grey);
@@ -835,6 +852,9 @@
         <!-- Built automatically from photos.json -->
       </div>
     </div>
+    <div class="photos-progress">
+      <div class="photos-progress-bar" id="photosProgressBar"></div>
+    </div>
   </section>
 
   <!-- Lightbox -->
@@ -992,11 +1012,19 @@
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhoto(); });
 
+    // Progress bar
+    const track = document.getElementById('photosTrack');
+    const bar = document.getElementById('photosProgressBar');
+    track.addEventListener('scroll', () => {
+      const pct = track.scrollLeft / (track.scrollWidth - track.clientWidth);
+      bar.style.width = (pct * 100) + '%';
+    });
+
     // Build photo grid automatically from photos.json
     fetch('photos.json?v=' + Date.now())
       .then(r => r.json())
       .then(photos => {
-        const track = document.getElementById('photosTrack');
+        const photoTrack = document.getElementById('photosTrack');
         // Split photos into columns of 2 (last col gets 1 if odd)
         const cols = [];
         for (let i = 0; i < photos.length; i += 2) {
@@ -1015,7 +1043,7 @@
             item.appendChild(img);
             col.appendChild(item);
           });
-          track.appendChild(col);
+          photoTrack.appendChild(col);
         });
       });
   </script>
