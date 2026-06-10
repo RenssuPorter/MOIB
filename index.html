@@ -414,7 +414,7 @@
     /* Progress bar */
     .photos-progress {
       height: 1px;
-      background: var(--grey);
+      background: rgba(255,255,255,0.12);
       margin: 16px 60px 0;
       position: relative;
     }
@@ -423,9 +423,26 @@
       top: 0;
       left: 0;
       height: 100%;
-      width: 0%;
+      width: 3%;
       background: #fff;
       transition: width 0.1s ease;
+    }
+
+    /* Carousel progress bar */
+    .carousel-progress {
+      height: 1px;
+      background: rgba(255,255,255,0.12);
+      margin: 0 40px;
+      position: relative;
+    }
+    .carousel-progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 3%;
+      background: #fff;
+      transition: width 0.3s ease;
     }
 
     /* ── BOOKING ── */
@@ -828,6 +845,9 @@
       <div class="dot" onclick="carouselGo(5)"></div>
     </div>
   </div>
+  <div class="carousel-progress">
+    <div class="carousel-progress-bar" id="carouselProgressBar"></div>
+  </div>
 
 
   <!-- LINKS -->
@@ -942,6 +962,8 @@
       counter.textContent = (current + 1) + ' / ' + total;
       btnPrev.classList.toggle('hidden', current === 0);
       btnNext.classList.toggle('hidden', current === total - 1);
+      const pct = current / (total - 1);
+      document.getElementById('carouselProgressBar').style.width = (3 + pct * 97) + '%';
     }
 
     function carouselMove(dir) {
