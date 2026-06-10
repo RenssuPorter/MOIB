@@ -300,6 +300,114 @@
 
     .link-block:hover .link-arrow { transform: translate(6px, -4px); }
 
+    /* ── PRESS PHOTOS ── */
+    #press-photos {
+      border-top: 1px solid var(--grey);
+      padding: 40px 0;
+    }
+
+    #press-photos .section-label {
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: 0 40px 24px;
+      display: block;
+    }
+
+    .photos-scroll-outer {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .photos-scroll-outer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 180px;
+      height: 100%;
+      background: linear-gradient(to right, transparent, var(--black));
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .photos-scroll-track {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 0 40px 4px 60px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .photos-scroll-track::-webkit-scrollbar { display: none; }
+
+    .photos-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 0 0 22vw;
+      min-width: 180px;
+    }
+
+    .photos-item {
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .photos-col:nth-child(odd)  .photos-item:first-child { height: 38vw; max-height: 420px; }
+    .photos-col:nth-child(odd)  .photos-item:last-child  { height: 24vw; max-height: 260px; }
+    .photos-col:nth-child(even) .photos-item:first-child { height: 24vw; max-height: 260px; }
+    .photos-col:nth-child(even) .photos-item:last-child  { height: 38vw; max-height: 420px; }
+    .photos-col.single .photos-item                      { height: 50vw; max-height: 500px; }
+
+    .photos-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease, filter 0.4s ease;
+      filter: grayscale(20%);
+    }
+
+    .photos-item:hover img {
+      transform: scale(1.04);
+      filter: grayscale(0%);
+    }
+
+    /* Lightbox */
+    .photos-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .photos-lightbox.active { display: flex; }
+    .photos-lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      box-shadow: 0 0 80px rgba(0,0,0,0.8);
+    }
+    .photos-lightbox-close {
+      position: fixed;
+      top: 24px;
+      right: 30px;
+      font-size: 32px;
+      color: #fff;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .photos-lightbox-close:hover { opacity: 1; }
+
     /* ── BOOKING ── */
     #booking {
       border-top: 1px solid var(--grey);
@@ -716,6 +824,64 @@
     </a>
   </div>
 
+  <!-- PRESS PHOTOS -->
+  <section id="press-photos">
+    <span class="section-label">Press Photos</span>
+    <div class="photos-scroll-outer">
+      <div class="photos-scroll-track">
+
+        <div class="photos-col">
+          <div class="photos-item" onclick="openPhoto('photos/DSC09528.jpg')">
+            <img src="photos/DSC09528.jpg" alt="MOIB Press Photo">
+          </div>
+          <div class="photos-item" onclick="openPhoto('photos/DSC09542.jpg')">
+            <img src="photos/DSC09542.jpg" alt="MOIB Press Photo">
+          </div>
+        </div>
+
+        <div class="photos-col">
+          <div class="photos-item" onclick="openPhoto('photos/DSC09566.jpg')">
+            <img src="photos/DSC09566.jpg" alt="MOIB Press Photo">
+          </div>
+          <div class="photos-item" onclick="openPhoto('photos/DSC09586.jpg')">
+            <img src="photos/DSC09586.jpg" alt="MOIB Press Photo">
+          </div>
+        </div>
+
+        <div class="photos-col">
+          <div class="photos-item" onclick="openPhoto('photos/DSC09627.jpg')">
+            <img src="photos/DSC09627.jpg" alt="MOIB Press Photo">
+          </div>
+          <div class="photos-item" onclick="openPhoto('photos/DSC09707.jpg')">
+            <img src="photos/DSC09707.jpg" alt="MOIB Press Photo">
+          </div>
+        </div>
+
+        <div class="photos-col">
+          <div class="photos-item" onclick="openPhoto('photos/DSCF3580.jpg')">
+            <img src="photos/DSCF3580.jpg" alt="MOIB Press Photo">
+          </div>
+          <div class="photos-item" onclick="openPhoto('photos/DSCF3586.jpg')">
+            <img src="photos/DSCF3586.jpg" alt="MOIB Press Photo">
+          </div>
+        </div>
+
+        <div class="photos-col single">
+          <div class="photos-item" onclick="openPhoto('photos/DSCF3597.jpg')">
+            <img src="photos/DSCF3597.jpg" alt="MOIB Press Photo">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="photos-lightbox" id="photosLightbox" onclick="closePhoto()">
+    <span class="photos-lightbox-close">✕</span>
+    <img id="photosLightboxImg" src="" alt="">
+  </div>
+
   <!-- BOOKING -->
   <a id="booking" href="mailto:moibband@gmail.com">
     <span class="booking-label">Get in touch</span>
@@ -853,6 +1019,17 @@
         item.classList.remove('playing');
       }
     }
+  </script>
+
+  <script>
+    function openPhoto(src) {
+      document.getElementById('photosLightboxImg').src = src;
+      document.getElementById('photosLightbox').classList.add('active');
+    }
+    function closePhoto() {
+      document.getElementById('photosLightbox').classList.remove('active');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhoto(); });
   </script>
 </body>
 </html>
