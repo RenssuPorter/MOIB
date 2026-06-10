@@ -831,50 +831,8 @@
   <section id="press-photos">
     <span class="section-label">Press Photos</span>
     <div class="photos-scroll-outer">
-      <div class="photos-scroll-track">
-
-        <div class="photos-col">
-          <div class="photos-item" onclick="openPhoto('Photos/DSC09528.jpg')">
-            <img src="Photos/DSC09528.jpg" alt="MOIB Press Photo">
-          </div>
-          <div class="photos-item" onclick="openPhoto('Photos/DSC09542.jpg')">
-            <img src="Photos/DSC09542.jpg" alt="MOIB Press Photo">
-          </div>
-        </div>
-
-        <div class="photos-col">
-          <div class="photos-item" onclick="openPhoto('Photos/DSC09566.jpg')">
-            <img src="Photos/DSC09566.jpg" alt="MOIB Press Photo">
-          </div>
-          <div class="photos-item" onclick="openPhoto('Photos/DSC09586.jpg')">
-            <img src="Photos/DSC09586.jpg" alt="MOIB Press Photo">
-          </div>
-        </div>
-
-        <div class="photos-col">
-          <div class="photos-item" onclick="openPhoto('Photos/DSC09627.jpg')">
-            <img src="Photos/DSC09627.jpg" alt="MOIB Press Photo">
-          </div>
-          <div class="photos-item" onclick="openPhoto('Photos/DSC09707.jpg')">
-            <img src="Photos/DSC09707.jpg" alt="MOIB Press Photo">
-          </div>
-        </div>
-
-        <div class="photos-col">
-          <div class="photos-item" onclick="openPhoto('Photos/DSCF3580.jpg')">
-            <img src="Photos/DSCF3580.jpg" alt="MOIB Press Photo">
-          </div>
-          <div class="photos-item" onclick="openPhoto('Photos/DSCF3586.jpg')">
-            <img src="Photos/DSCF3586.jpg" alt="MOIB Press Photo">
-          </div>
-        </div>
-
-        <div class="photos-col single">
-          <div class="photos-item" onclick="openPhoto('Photos/DSCF3597.jpg')">
-            <img src="Photos/DSCF3597.jpg" alt="MOIB Press Photo">
-          </div>
-        </div>
-
+      <div class="photos-scroll-track" id="photosTrack">
+        <!-- Built automatically from photos.json -->
       </div>
     </div>
   </section>
@@ -1033,6 +991,33 @@
       document.getElementById('photosLightbox').classList.remove('active');
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhoto(); });
+
+    // Build photo grid automatically from photos.json
+    fetch('photos.json?v=' + Date.now())
+      .then(r => r.json())
+      .then(photos => {
+        const track = document.getElementById('photosTrack');
+        // Split photos into columns of 2 (last col gets 1 if odd)
+        const cols = [];
+        for (let i = 0; i < photos.length; i += 2) {
+          cols.push(photos.slice(i, i + 2));
+        }
+        cols.forEach((colPhotos, colIndex) => {
+          const col = document.createElement('div');
+          col.className = 'photos-col' + (colPhotos.length === 1 ? ' single' : '');
+          colPhotos.forEach(src => {
+            const item = document.createElement('div');
+            item.className = 'photos-item';
+            item.onclick = () => openPhoto(src);
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = 'MOIB Press Photo';
+            item.appendChild(img);
+            col.appendChild(item);
+          });
+          track.appendChild(col);
+        });
+      });
   </script>
 </body>
 </html>
