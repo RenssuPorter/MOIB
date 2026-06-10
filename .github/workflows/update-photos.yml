@@ -13,10 +13,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate photos.json
+      - name: Add new photos to photos.json without reordering
         run: |
-          files=$(ls Photos/*.jpg Photos/*.jpeg Photos/*.png 2>/dev/null | sort | sed 's|^|"|;s|$|"|' | paste -sd ',' -)
-          echo "[$files]" > photos.json
+          python3 - <<'EOF'
+          import json, os, glob
+
+          # Load existing order
+          with open('photos.json', 'r') as f:
+              existing = json.load(f)
+
+          # Find all photos on disk
+          on_disk = set(
+            p.replace('\\', '/')
+            for p in glob.glob('Photos/*.jpg') + glob.glob('Photos/*.jpeg') + glob.glob('Photos/*.png')
+          )
+
+          # Remove deleted ones, keep order
+          updated = [p for p in existing if p in on_disk]
+
+          # Append new ones at the end
+          for p in sorted(on_disk):
+              if p not in updated:
+                  updated.append(p)
+
+          with open('photos.json', 'w') as f:
+              json.dump(updated, f, indent=2)
+
+          print("photos.json updated:", updated)
+          EOF
 
       - name: Commit updated photos.json
         run: |
